@@ -1,116 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Station Profile</title>
+  <title>Station Profile - MAS</title>
   <style>
-    body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
-    .section { display: none; margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-    input, select, button { padding: 10px; margin: 5px; width: 100%; max-width: 300px; box-sizing: border-box; }
-    button { background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:disabled { background: #ccc; }
-    #preview { margin: 20px 0; border: 1px solid #eee; max-height: 300px; overflow: auto; }
-    .file-item { border: 1px solid #ccc; margin: 10px 0; padding: 15px; border-radius: 5px; }
-    .file-header { font-weight: bold; color: #007bff; }
+    body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f8f9fa; }
+    .section { display: none; margin: 20px 0; padding: 25px; border: 1px solid #dee2e6; border-radius: 10px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    input, select, button { padding: 12px; margin: 8px 0; width: 100%; max-width: 300px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 6px; font-size: 16px; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #6c757d; cursor: not-allowed; }
+    #preview { margin: 20px 0; border: 2px solid #eee; border-radius: 8px; max-height: 350px; overflow: auto; background: #f8f9fa; }
+    .file-item { border: 1px solid #dee2e6; margin: 12px 0; padding: 20px; border-radius: 8px; background: #fff; }
+    .file-header { font-weight: 600; color: #007bff; font-size: 16px; margin-bottom: 8px; }
     .show { display: block !important; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .filter-group { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+    @media (max-width: 768px) { .filter-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <h1>🏛️ Station Profile Management</h1>
+  <h1 style="text-align:center; color:#007bff; margin-bottom:30px;">🚂 Station Profile Management - MAS</h1>
   
   <!-- Login Section -->
   <div id="login-section" class="section show">
     <h2>🔐 Login</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button id="login-btn" onclick="login()">Login</button>
-    <div style="margin-top: 10px;">
-      <small>Test accounts:<br>
+    <input type="email" id="email" placeholder="Enter your email">
+    <input type="password" id="password" placeholder="Enter your password">
+    <button id="login-btn">Login</button>
+    <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 6px;">
+      <strong>🧪 Test Accounts:</strong><br>
       Officer: test.officer@gmail.com / officer123<br>
       MCDO: mcdouser@gmail.com / mcdo123<br>
       BDU: bduuser@gmail.com / bdu123<br>
       MPP: mppuser@gmail.com / mpp123
-      </small>
     </div>
   </div>
 
   <!-- Upload Section (MCDO/BDU) -->
   <div id="upload-section" class="section">
-    <h2>📤 File Upload - <span id="user-role"></span></h2>
-<select id="period">
-  <option id="today-date" value="Present">Present date</option>
-  <option value="Weekly">Weekly</option>
-  <option value="Monthly">Monthly</option>
-  <option value="Quarterly">Quarterly</option>
-  <option value="Half-yearly">Half-yearly</option>
-  <option value="Annually">Annually</option>
-</select>
-    <br>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2>📤 File Upload - <span id="user-role" style="color:#007bff;"></span></h2>
+      <button onclick="logout()" style="width:auto; background:#6c757d;">Logout</button>
+    </div>
+    <select id="period">
+      <option id="today-date" value="Present">Present date</option>
+      <option value="Weekly">Weekly</option>
+      <option value="Monthly">Monthly</option>
+      <option value="Quarterly">Quarterly</option>
+      <option value="Half-yearly">Half-yearly</option>
+      <option value="Annually">Annually</option>
+    </select>
     <input type="file" id="file-input" onchange="previewFile()">
     <div id="preview"></div>
     <button id="upload-btn" onclick="uploadFile()" disabled>Upload File</button>
   </div>
 
   <!-- Officer Dashboard -->
-<div id="officer-dashboard" class="section">
-  <h2>📊 Officer Dashboard - Recent Files</h2>
-  <button onclick="logout()" style="width:auto; margin-bottom:10px;">Logout</button>
-  
-  <!-- Filters -->
-  <div style="background:#f8f9fa; padding:15px; border-radius:5px; margin-bottom:20px;">
-    <h3>🔍 Filters</h3>
-    
-    <!-- Date Range -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-      <input type="date" id="from-date" onchange="applyFilters()">
-      <input type="date" id="to-date" onchange="applyFilters()">
+  <div id="officer-dashboard" class="section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2>📊 Officer Dashboard</h2>
+      <button onclick="logout()" style="width:auto; background:#6c757d;">Logout</button>
     </div>
     
-    <!-- Month Wise -->
-    <select id="month-filter" onchange="applyFilters()">
-      <option value="">All Months</option>
-      <option value="Jan">January</option>
-      <option value="Feb">February</option>
-      <option value="Mar">March</option>
-      <option value="Apr">April</option>
-      <option value="May">May</option>
-      <option value="Jun">June</option>
-      <option value="Jul">July</option>
-      <option value="Aug">August</option>
-      <option value="Sep">September</option>
-      <option value="Oct">October</option>
-      <option value="Nov">November</option>
-      <option value="Dec">December</option>
-    </select>
+    <!-- Filters -->
+    <div class="filter-group">
+      <h3>🔍 Advanced Filters</h3>
+      <div class="filter-grid">
+        <div>
+          <label>From Date</label>
+          <input type="date" id="from-date" onchange="applyFilters()">
+        </div>
+        <div>
+          <label>To Date</label>
+          <input type="date" id="to-date" onchange="applyFilters()">
+        </div>
+        <div>
+          <label>Month</label>
+          <select id="month-filter" onchange="applyFilters()">
+            <option value="">All Months</option>
+            <option value="Jan">January</option><option value="Feb">February</option>
+            <option value="Mar">March</option><option value="Apr">April</option>
+            <option value="May">May</option><option value="Jun">June</option>
+            <option value="Jul">July</option><option value="Aug">August</option>
+            <option value="Sep">September</option><option value="Oct">October</option>
+            <option value="Nov">November</option><option value="Dec">December</option>
+          </select>
+        </div>
+        <div>
+          <label>Financial Year</label>
+          <select id="fy-filter" onchange="applyFilters()">
+            <option value="">All FY</option>
+            <option value="2024-25">FY 2024-25</option>
+            <option value="2025-26">FY 2025-26</option>
+            <option value="2026-27">FY 2026-27</option>
+          </select>
+        </div>
+        <div>
+          <label>Role</label>
+          <select id="role-filter" onchange="applyFilters()">
+            <option value="Officer">All Roles</option>
+            <option value="MCDO">MCDO Only</option>
+            <option value="BDU">BDU Only</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="loadRecentFiles()" style="width:auto;">🔄 Refresh</button>
+        <button onclick="downloadFilteredCSV()" style="width:auto; background:#28a745;">📥 Download CSV</button>
+      </div>
+    </div>
     
-    <!-- Financial Year -->
-    <select id="fy-filter" onchange="applyFilters()">
-      <option value="">All FY</option>
-      <option value="2024-25">FY 2024-25</option>
-      <option value="2025-26">FY 2025-26</option>
-      <option value="2026-27">FY 2026-27</option>
-    </select>
-    
-    <!-- Role Filter -->
-    <select id="role-filter" onchange="applyFilters()">
-      <option value="Officer">All Roles</option>
-      <option value="MCDO">MCDO Only</option>
-      <option value="BDU">BDU Only</option>
-    </select>
-    
-    <button onclick="loadRecentFiles()" style="width:auto;">🔄 Refresh</button>
-    <button onclick="downloadFilteredCSV()" style="width:auto; background:#28a745;">📥 Download CSV</button>
-  </div>
-  
-  <!-- Results -->
-  <div style="margin-top:20px;">
-    <div id="filter-count" style="font-weight:bold; color:#007bff;"></div>
+    <div id="filter-count" style="font-weight:600; color:#007bff; margin-bottom:15px;"></div>
     <div id="files-list">Loading...</div>
   </div>
-</div>
 
   <!-- MPP Section -->
   <div id="mpp-section" class="section">
     <h2>🚧 MPP - Future Functionality</h2>
+    <button onclick="logout()" style="width:auto; background:#6c757d;">Logout</button>
     <p>Man Power Planning features coming soon.</p>
   </div>
 
