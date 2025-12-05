@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEBAPP_URL_HERE'; // Paste your Apps Script URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzltIvZnp4Kq_49UREknIZegUz5WGiCB3NUTMqsH2hxN_QhOy-EmXZMTzH6rZcw8klfVw/exec'; // Paste your Apps Script URL
 let currentUser = null;
 
 function login() {
