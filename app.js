@@ -9,9 +9,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Setup buttons
+  // Setup login button
   const loginBtn = document.getElementById('login-btn');
-  if (loginBtn) loginBtn.addEventListener('click', login);
+  if (loginBtn) {
+    loginBtn.addEventListener('click', login);
+  }
+  
+  // Setup upload button
+  const uploadBtn = document.getElementById('upload-btn');
+  if (uploadBtn) {
+    uploadBtn.addEventListener('click', uploadFile);
+  }
 });
 
 let currentUser = null;
@@ -36,7 +44,7 @@ function login() {
       try {
         const result = JSON.parse(text);
         if (result.status === 'success') {
-          currentUser = { role: result.role, station: result.station };
+          currentUser = { role: result.role, station: result.station || 'MAS' };
           showDashboard();
         } else {
           alert(result.message || 'Login failed');
@@ -73,9 +81,10 @@ function logout() {
   document.getElementById('password').value = '';
 }
 
-// Filter functions
 function loadRecentFiles() {
-  document.getElementById('files-list').innerHTML = 'Loading...';
+  const filesList = document.getElementById('files-list');
+  filesList.innerHTML = 'Loading...';
+  
   fetch(`${SCRIPT_URL}?action=files&role=Officer&full=true`)
     .then(r => r.text())
     .then(text => {
@@ -84,8 +93,9 @@ function loadRecentFiles() {
       filteredFiles = allFiles;
       applyFilters();
     })
-    .catch(() => {
-      document.getElementById('files-list').innerHTML = 'Error loading files';
+    .catch(err => {
+      filesList.innerHTML = 'Error loading files';
+      console.error('Files error:', err);
     });
 }
 
@@ -117,7 +127,7 @@ function applyFilters() {
 function getFinancialYear(date) {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
-  return month >= 4 ? `${year-1}-${year.toString().slice(-2)}` : `${year-2}-${year-1.toString().slice(-2)}`;
+  return month >= 4 ? `${year-1}-${year.toString().slice(-2)}` : `${year-2}-${(year-1).toString().slice(-2)}`;
 }
 
 function displayFiles(files) {
@@ -156,9 +166,9 @@ function downloadFilteredCSV() {
   a.href = url;
   a.download = `MAS-Station-Files-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
+  window.URL.revokeObjectURL(url);
 }
 
-// Upload functions (previewFile, uploadFile) - SAME AS BEFORE
 function previewFile() {
   const file = document.getElementById('file-input').files[0];
   const preview = document.getElementById('preview');
@@ -166,7 +176,7 @@ function previewFile() {
   
   if (file) {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = function(e) {
       if (file.type.startsWith('image/')) {
         preview.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:300px;">`;
       } else {
@@ -174,7 +184,7 @@ function previewFile() {
           <strong>${file.name}</strong><br>Size: ${(file.size/1024).toFixed(1)}KB
         </div>`;
       }
-      uploadBtn.disabled = false;
+      if (uploadBtn) uploadBtn.disabled = false;
     };
     reader.readAsDataURL(file);
   }
@@ -185,8 +195,10 @@ function uploadFile() {
   const period = document.getElementById('period').value;
   const uploadBtn = document.getElementById('upload-btn');
   
+  if (!file) return;
+  
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = function(e) {
     const formData = new FormData();
     formData.append('action', 'upload');
     formData.append('role', currentUser.role);
@@ -196,8 +208,10 @@ function uploadFile() {
     formData.append('fileType', file.type);
     formData.append('fileData', e.target.result);
     
-    uploadBtn.textContent = 'Uploading...';
-    uploadBtn.disabled = true;
+    if (uploadBtn) {
+      uploadBtn.textContent = 'Uploading...';
+      uploadBtn.disabled = true;
+    }
     
     fetch(SCRIPT_URL, { method: 'POST', body: formData })
       .then(r => r.text())
@@ -208,11 +222,16 @@ function uploadFile() {
           document.getElementById('file-input').value = '';
           document.getElementById('preview').innerHTML = '';
           if (currentUser.role === 'Officer') loadRecentFiles();
+        } else {
+          alert('Upload failed');
         }
       })
+      .catch(err => alert('Upload error'))
       .finally(() => {
-        uploadBtn.textContent = 'Upload File';
-        uploadBtn.disabled = false;
+        if (uploadBtn) {
+          uploadBtn.textContent = 'Upload File';
+          uploadBtn.disabled = false;
+        }
       });
   };
   reader.readAsDataURL(file);
