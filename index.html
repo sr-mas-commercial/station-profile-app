@@ -51,10 +51,62 @@
   </div>
 
   <!-- Officer Dashboard -->
-  <div id="officer-dashboard" class="section">
-    <h2>📊 Officer Dashboard - Recent Files</h2>
+<div id="officer-dashboard" class="section">
+  <h2>📊 Officer Dashboard - Recent Files</h2>
+  <button onclick="logout()" style="width:auto; margin-bottom:10px;">Logout</button>
+  
+  <!-- Filters -->
+  <div style="background:#f8f9fa; padding:15px; border-radius:5px; margin-bottom:20px;">
+    <h3>🔍 Filters</h3>
+    
+    <!-- Date Range -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+      <input type="date" id="from-date" onchange="applyFilters()">
+      <input type="date" id="to-date" onchange="applyFilters()">
+    </div>
+    
+    <!-- Month Wise -->
+    <select id="month-filter" onchange="applyFilters()">
+      <option value="">All Months</option>
+      <option value="Jan">January</option>
+      <option value="Feb">February</option>
+      <option value="Mar">March</option>
+      <option value="Apr">April</option>
+      <option value="May">May</option>
+      <option value="Jun">June</option>
+      <option value="Jul">July</option>
+      <option value="Aug">August</option>
+      <option value="Sep">September</option>
+      <option value="Oct">October</option>
+      <option value="Nov">November</option>
+      <option value="Dec">December</option>
+    </select>
+    
+    <!-- Financial Year -->
+    <select id="fy-filter" onchange="applyFilters()">
+      <option value="">All FY</option>
+      <option value="2024-25">FY 2024-25</option>
+      <option value="2025-26">FY 2025-26</option>
+      <option value="2026-27">FY 2026-27</option>
+    </select>
+    
+    <!-- Role Filter -->
+    <select id="role-filter" onchange="applyFilters()">
+      <option value="Officer">All Roles</option>
+      <option value="MCDO">MCDO Only</option>
+      <option value="BDU">BDU Only</option>
+    </select>
+    
+    <button onclick="loadRecentFiles()" style="width:auto;">🔄 Refresh</button>
+    <button onclick="downloadFilteredCSV()" style="width:auto; background:#28a745;">📥 Download CSV</button>
+  </div>
+  
+  <!-- Results -->
+  <div style="margin-top:20px;">
+    <div id="filter-count" style="font-weight:bold; color:#007bff;"></div>
     <div id="files-list">Loading...</div>
   </div>
+</div>
 
   <!-- MPP Section -->
   <div id="mpp-section" class="section">
