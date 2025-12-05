@@ -1,4 +1,16 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzltIvZnp4Kq_49UREknIZegUz5WGiCB3NUTMqsH2hxN_QhOy-EmXZMTzH6rZcw8klfVw/exec';
+// AUTO SET "PRESENT DATE" (runs when page loads)
+document.addEventListener('DOMContentLoaded', function() {
+  const todayOption = document.getElementById('today-date');
+  if (todayOption) {
+    const today = new Date().toLocaleDateString('en-IN', { 
+      day: 'numeric', 
+      month: 'short', 
+      year: 'numeric' 
+    });
+    todayOption.textContent = today; // Shows "5 Dec 2025"
+  }
+});
 let currentUser = null;
 
 function login() {
