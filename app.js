@@ -149,6 +149,112 @@ function uploadFile() {
   reader.readAsDataURL(file);
 }
 
+// Filter variables
+let allFiles = [];
+let filteredFiles = [];
+
+function loadRecentFiles() {
+  const filesList = document.getElementById('files-list');
+  filesList.innerHTML = 'Loading...';
+  
+  fetch(`${SCRIPT_URL}?action=files&role=Officer&full=true`)
+    .then(r => r.text())
+    .then(text => {
+      const result = JSON.parse(text);
+      allFiles = result.files;
+      filteredFiles = allFiles;
+      applyFilters();
+    })
+    .catch(err => {
+      filesList.innerHTML = 'Error loading files';
+      console.error('Files error:', err);
+    });
+}
+
+function applyFilters() {
+  const fromDate = document.getElementById('from-date').value;
+  const toDate = document.getElementById('to-date').value;
+  const monthFilter = document.getElementById('month-filter').value;
+  const fyFilter = document.getElementById('fy-filter').value;
+  const roleFilter = document.getElementById('role-filter').value;
+  
+  filteredFiles = allFiles.filter(file => {
+    const fileDate = new Date(file[0]);
+    const fileMonth = fileDate.toLocaleDateString('en-IN', { month: 'short' });
+    const fileFY = getFinancialYear(fileDate);
+    
+    // Date range filter
+    if (fromDate && fileDate < new Date(fromDate)) return false;
+    if (toDate && fileDate > new Date(toDate)) return false;
+    
+    // Month filter
+    if (monthFilter && fileMonth !== monthFilter) return false;
+    
+    // FY filter
+    if (fyFilter && fileFY !== fyFilter) return false;
+    
+    // Role filter
+    if (roleFilter !== 'Officer' && file[1] !== roleFilter) return false;
+    
+    return true;
+  });
+  
+  displayFiles(filteredFiles);
+  document.getElementById('filter-count').textContent = 
+    `${filteredFiles.length} files found`;
+}
+
+function getFinancialYear(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  return month >= 4 ? `${year-1}-${year.toString().slice(-2)}` : `${year-2}-${year-1.toString().slice(-2)}`;
+}
+
+function displayFiles(files) {
+  const filesList = document.getElementById('files-list');
+  
+  if (files.length === 0) {
+    filesList.innerHTML = '<p style="text-align:center; color:#666;">No files match the selected filters.</p>';
+    return;
+  }
+  
+  filesList.innerHTML = files.map(file => {
+    const fileDate = new Date(file[0]);
+    const fileMonth = fileDate.toLocaleDateString('en-IN', { month: 'short' });
+    const fileFY = getFinancialYear(fileDate);
+    
+    return `
+      <div class="file-item">
+        <div class="file-header">
+          ${file[2]} - ${file[1]} (${file[3]}) | ${fileMonth} | FY ${fileFY}
+        </div>
+        <div><a href="${file[5]}" target="_blank">${file[4]}</a></div>
+        <div>${fileDate.toLocaleString('en-IN')} | ${file[6]} KB</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function downloadFilteredCSV() {
+  if (filteredFiles.length === 0) {
+    alert('No files to download');
+    return;
+  }
+  
+  let csv = 'Timestamp,Role,Period,Uploader,FileName,DriveLink,SizeKB\n';
+  filteredFiles.forEach(file => {
+    csv += `${new Date(file[0]).toLocaleString('en-IN')},"${file[1]}","${file[2]}","${file[3]}","${file[4]}",${file[5]},${file[6]}\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Station-Files-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
 function loadRecentFiles() {
   const filesList = document.getElementById('files-list');
   filesList.innerHTML = 'Loading...';
