@@ -36,14 +36,14 @@
   <!-- Upload Section (MCDO/BDU) -->
   <div id="upload-section" class="section">
     <h2>📤 File Upload - <span id="user-role"></span></h2>
-    <select id="period">
-      <option value="Daily">Daily</option>
-      <option value="Weekly">Weekly</option>
-      <option value="Monthly">Monthly</option>
-      <option value="Quarterly">Quarterly</option>
-      <option value="Half-yearly">Half-yearly</option>
-      <option value="Annually">Annually</option>
-    </select>
+<select id="period">
+  <option id="today-date" value="Present">Present date</option>
+  <option value="Weekly">Weekly</option>
+  <option value="Monthly">Monthly</option>
+  <option value="Quarterly">Quarterly</option>
+  <option value="Half-yearly">Half-yearly</option>
+  <option value="Annually">Annually</option>
+</select>
     <br>
     <input type="file" id="file-input" onchange="previewFile()">
     <div id="preview"></div>
