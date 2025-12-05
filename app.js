@@ -1,22 +1,24 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzltIvZnp4Kq_49UREknIZegUz5WGiCB3NUTMqsH2hxN_QhOy-EmXZMTzH6rZcw8klfVw/exec'; // Paste your Apps Script URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzltIvZnp4Kq_49UREknIZegUz5WGiCB3NUTMqsH2hxN_QhOy-EmXZMTzH6rZcw8klfVw/exec';
 let currentUser = null;
 
 function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
+  const loginBtn = document.getElementById('login-btn');
   
   if (!email || !password) {
     alert('Please enter email and password');
     return;
   }
   
-  document.getElementById('login-btn').textContent = 'Logging in...';
+  if (loginBtn) loginBtn.textContent = 'Logging in...';
   
   fetch(`${SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`)
     .then(r => r.text())
     .then(text => {
       try {
         const result = JSON.parse(text);
+        console.log('Login response:', result); // Debug
         if (result.status === 'success') {
           currentUser = {
             role: result.role,
@@ -24,22 +26,23 @@ function login() {
           };
           showDashboard();
         } else {
-          alert(result.message);
+          alert(result.message || 'Login failed');
         }
       } catch (e) {
-        alert('Login error: ' + e.message);
+        console.error('Parse error:', text);
+        alert('Login error: Invalid response');
       }
     })
     .catch(err => {
-      alert('Network error: ' + err.message);
+      console.error('Network error:', err);
+      alert('Network error: Cannot reach server');
     })
     .finally(() => {
-      document.getElementById('login-btn').textContent = 'Login';
+      if (loginBtn) loginBtn.textContent = 'Login';
     });
 }
 
 function showDashboard() {
-  // Hide all sections
   document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
   
   if (currentUser.role === 'Officer') {
@@ -51,6 +54,14 @@ function showDashboard() {
   } else if (currentUser.role === 'MPP') {
     document.getElementById('mpp-section').classList.add('show');
   }
+}
+
+function logout() {
+  currentUser = null;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
+  document.getElementById('login-section').classList.add('show');
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
 }
 
 function previewFile() {
@@ -81,6 +92,7 @@ function previewFile() {
 function uploadFile() {
   const file = document.getElementById('file-input').files[0];
   const period = document.getElementById('period').value;
+  const uploadBtn = document.getElementById('upload-btn');
   
   if (!file) return;
   
@@ -95,8 +107,8 @@ function uploadFile() {
     formData.append('fileType', file.type);
     formData.append('fileData', e.target.result);
     
-    document.getElementById('upload-btn').textContent = 'Uploading...';
-    document.getElementById('upload-btn').disabled = true;
+    uploadBtn.textContent = 'Uploading...';
+    uploadBtn.disabled = true;
     
     fetch(SCRIPT_URL, {
       method: 'POST',
@@ -110,34 +122,35 @@ function uploadFile() {
         document.getElementById('file-input').value = '';
         document.getElementById('preview').innerHTML = '';
         if (currentUser.role === 'Officer') {
-          loadRecentFiles(); // Refresh dashboard
+          loadRecentFiles();
         }
       } else {
-        alert('Upload failed: ' + result.message);
+        alert('Upload failed: ' + (result.message || 'Unknown error'));
       }
     })
     .catch(err => alert('Upload error: ' + err.message))
     .finally(() => {
-      document.getElementById('upload-btn').textContent = 'Upload File';
-      document.getElementById('upload-btn').disabled = false;
+      uploadBtn.textContent = 'Upload File';
+      uploadBtn.disabled = false;
     });
   };
   reader.readAsDataURL(file);
 }
 
 function loadRecentFiles() {
+  const filesList = document.getElementById('files-list');
+  filesList.innerHTML = 'Loading...';
+  
   fetch(`${SCRIPT_URL}?action=files&role=Officer`)
     .then(r => r.text())
     .then(text => {
       const result = JSON.parse(text);
-      const list = document.getElementById('files-list');
-      
       if (result.files.length === 0) {
-        list.innerHTML = '<p>No files uploaded yet.</p>';
+        filesList.innerHTML = '<p>No files uploaded yet.</p>';
         return;
       }
       
-      list.innerHTML = result.files.map(file => `
+      filesList.innerHTML = result.files.map(file => `
         <div class="file-item">
           <div class="file-header">
             ${file[2]} - ${file[1]} (${file[3]})
@@ -148,6 +161,7 @@ function loadRecentFiles() {
       `).join('');
     })
     .catch(err => {
-      document.getElementById('files-list').innerHTML = 'Error loading files';
+      filesList.innerHTML = 'Error loading files';
+      console.error('Files error:', err);
     });
 }
