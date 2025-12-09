@@ -4,16 +4,17 @@ let currentUser = null;
 let allFiles = [];
 let filteredFiles = [];
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Set present date
+document.addEventListener('DOMContentLoaded', function () {
   const todayOption = document.getElementById('today-date');
   if (todayOption) {
-    todayOption.textContent = new Date().toLocaleDateString('en-IN', {
-      day: 'numeric', month: 'short', year: 'numeric'
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
+    todayOption.textContent = today;   // e.g. 09-12-2025
   }
-  
-  // Login button
+
   const loginBtn = document.getElementById('login-btn');
   if (loginBtn) loginBtn.addEventListener('click', login);
 });
