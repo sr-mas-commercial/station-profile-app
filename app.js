@@ -91,12 +91,38 @@ function applyFilters() {
 }
 
 function displayFiles(files) {
-  const list = document.getElementById('files-list');
-  if (files.length === 0) {
-    list.innerHTML = '<p>No files</p>';
+  const filesList = document.getElementById('files-list');
+
+  if (!files || files.length === 0) {
+    filesList.innerHTML = '<p style="text-align:center;color:#666;">No files match filters</p>';
     return;
   }
-  list.innerHTML = files.map(f => `<div>${f[4]} - ${f[1]}</div>`).join('');
+
+  filesList.innerHTML = files
+    .map(file => {
+      const fileDate = new Date(file[0]);      // Timestamp
+      const role = file[1];                    // Role (MCDO/BDU)
+      const period = file[2];                  // Period (Present/Weekly/etc.)
+      const uploader = file[3];                // Uploader text
+      const fileName = file[4];                // File name
+      const link = file[5];                    // Drive link
+      const size = file[6];                    // SizeKB
+
+      return `
+        <div class="file-item">
+          <div class="file-header">
+            ${period} - ${role} (${uploader})
+          </div>
+          <div>
+            <a href="${link}" target="_blank">${fileName}</a>
+          </div>
+          <div>
+            ${fileDate.toLocaleString('en-IN')} | ${size} KB
+          </div>
+        </div>
+      `;
+    })
+    .join('');
 }
 
 function previewFile() {
